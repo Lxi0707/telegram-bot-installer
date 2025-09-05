@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 
 # Telegram 机器人管理脚本
@@ -31,6 +32,7 @@ show_menu() {
     echo -e "${BLUE}=================================${NC}"
     
     read -p "请输入您的选择 [0-9]: " choice
+    echo ""
 }
 
 # 读取当前配置
@@ -53,25 +55,39 @@ configure_bot() {
     
     read_config
     
-    # 获取当前值或设置默认值
-    CURRENT_TOKEN=${BOT_TOKEN:-"8408900332:AAFmroWfxm46-kb-ab0PtjApP5TK3gSdg4M"}
-    CURRENT_ADMIN=${ADMIN_USER_ID:-"6553906322"}
-    CURRENT_GROUP=${GROUP_CHAT_ID:-"-1003009478386"}
-    
-    echo -e "当前配置:"
-    echo -e "BOT_TOKEN: ${YELLOW}$CURRENT_TOKEN${NC}"
-    echo -e "ADMIN_USER_ID: ${YELLOW}$CURRENT_ADMIN${NC}"
-    echo -e "GROUP_CHAT_ID: ${YELLOW}$CURRENT_GROUP${NC}"
+    echo -e "${YELLOW}请输入机器人配置信息：${NC}"
     echo ""
     
-    read -p "请输入 BOT_TOKEN [$CURRENT_TOKEN]: " new_token
-    read -p "请输入 ADMIN_USER_ID [$CURRENT_ADMIN]: " new_admin
-    read -p "请输入 GROUP_CHAT_ID [$CURRENT_GROUP]: " new_group
+    # 获取输入，如果已有配置则显示提示
+    if [ -n "$BOT_TOKEN" ]; then
+        read -p "请输入 BOT_TOKEN [当前已设置]: " new_token
+    else
+        read -p "请输入 BOT_TOKEN: " new_token
+    fi
+    
+    if [ -n "$ADMIN_USER_ID" ]; then
+        read -p "请输入 ADMIN_USER_ID [当前: $ADMIN_USER_ID]: " new_admin
+    else
+        read -p "请输入 ADMIN_USER_ID: " new_admin
+    fi
+    
+    if [ -n "$GROUP_CHAT_ID" ]; then
+        read -p "请输入 GROUP_CHAT_ID [当前: $GROUP_CHAT_ID]: " new_group
+    else
+        read -p "请输入 GROUP_CHAT_ID: " new_group
+    fi
     
     # 使用新值或保持原值
-    new_token=${new_token:-$CURRENT_TOKEN}
-    new_admin=${new_admin:-$CURRENT_ADMIN}
-    new_group=${new_group:-$CURRENT_GROUP}
+    new_token=${new_token:-$BOT_TOKEN}
+    new_admin=${new_admin:-$ADMIN_USER_ID}
+    new_group=${new_group:-$GROUP_CHAT_ID}
+    
+    # 验证输入
+    if [ -z "$new_token" ] || [ -z "$new_admin" ] || [ -z "$new_group" ]; then
+        echo -e "${RED}❌ 所有字段都必须填写！${NC}"
+        sleep 2
+        return
+    fi
     
     # 创建配置目录
     mkdir -p "$INSTALL_DIR"
@@ -97,7 +113,9 @@ view_config() {
     if [ -f "$CONFIG_FILE" ]; then
         echo -e "${GREEN}配置文件: $CONFIG_FILE${NC}"
         echo ""
-        cat "$CONFIG_FILE"
+        # 安全地显示配置，隐藏敏感信息
+        echo "BOT_TOKEN = ***（已设置）***"
+        grep -v "BOT_TOKEN" "$CONFIG_FILE" | grep -v "DATABASE_NAME"
     else
         echo -e "${RED}❌ 配置文件不存在${NC}"
     fi
@@ -124,18 +142,23 @@ install_bot() {
         echo -e "${RED}❌ 请先配置机器人参数!${NC}"
         sleep 2
         configure_bot
+        if [ ! -f "$CONFIG_FILE" ]; then
+            echo -e "${RED}❌ 配置未完成，安装取消${NC}"
+            sleep 2
+            return
+        fi
     fi
     
     read_config
     
-    echo -e "使用以下配置安装:"
-    echo -e "BOT_TOKEN: ${YELLOW}$BOT_TOKEN${NC}"
-    echo -e "ADMIN_USER_ID: ${YELLOW}$ADMIN_USER_ID${NC}"
-    echo -e "GROUP_CHAT_ID: ${YELLOW}$GROUP_CHAT_ID${NC}"
+    echo -e "${YELLOW}即将使用以下配置安装:${NC}"
+    echo -e "BOT_TOKEN: ***（已设置）***"
+    echo -e "ADMIN_USER_ID: $ADMIN_USER_ID"
+    echo -e "GROUP_CHAT_ID: $GROUP_CHAT_ID"
     echo ""
     
     read -p "确认安装？(y/n): " confirm
-    if [ "$confirm" != "y" ]; then
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
         echo -e "${YELLOW}安装取消${NC}"
         sleep 2
         return
@@ -153,11 +176,12 @@ install_bot() {
     # 创建虚拟环境
     echo -e "${BLUE}🐍 创建Python虚拟环境...${NC}"
     python3 -m venv bot-env
-    source bot-env/bin/activate
     
     # 安装Python包
     echo -e "${BLUE}📦 安装Python依赖...${NC}"
+    source bot-env/bin/activate
     pip install python-telegram-bot
+    deactivate
     
     # 创建主程序文件
     echo -e "${BLUE}💻 创建主程序文件...${NC}"
@@ -288,7 +312,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         stats_message = (
             f"📊 机器人使用统计:\n"
             f"总用户数: {total_users}\n"
-            f"总消息数: {total_messages}\n\n"
+            f"总消息数: $total_messages\n\n"
             f"最新用户: {user.first_name} (@{user.username})\n"
             f"用户ID: {user.id}"
         )
@@ -315,7 +339,7 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stats_text = (
         f"🤖 机器人统计信息:\n\n"
         f"总用户数: {total_users}\n"
-        f"总消息数: {total_messages}\n\n"
+        f"总消息数: $total_messages\n\n"
         f"📈 使用最多的前10位用户:\n"
     )
     
@@ -513,21 +537,13 @@ generate_script() {
     clear
     echo -e "${BLUE}=== 生成安装脚本 ===${NC}"
     
-    if [ ! -f "$CONFIG_FILE" ]; then
-        echo -e "${RED}❌ 请先配置机器人参数!${NC}"
-        sleep 2
-        return
-    fi
-    
-    read_config
-    
     SCRIPT_FILE="/tmp/install_telegram_bot.sh"
     
-    cat > "$SCRIPT_FILE" << EOL
+    cat > "$SCRIPT_FILE" << 'EOL'
 #!/bin/bash
 
 # Telegram 机器人自动安装脚本
-# 生成的脚本不包含敏感信息，需要手动配置
+# 需要手动配置敏感信息
 
 echo "🚀 开始安装 Telegram 消息转发机器人..."
 
@@ -548,6 +564,7 @@ source bot-env/bin/activate
 # 安装Python包
 echo "📦 安装Python依赖..."
 pip install python-telegram-bot
+deactivate
 
 # 创建配置文件
 echo "⚙️ 创建配置文件..."
@@ -690,7 +707,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         stats_message = (
             f"📊 机器人使用统计:\n"
             f"总用户数: {total_users}\n"
-            f"总消息数: {total_messages}\n\n"
+            f"总消息数: $total_messages\n\n"
             f"最新用户: {user.first_name} (@{user.username})\n"
             f"用户ID: {user.id}"
         )
@@ -717,7 +734,7 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stats_text = (
         f"🤖 机器人统计信息:\n\n"
         f"总用户数: {total_users}\n"
-        f"总消息数: {total_messages}\n\n"
+        f"总消息数: $total_messages\n\n"
         f"📈 使用最多的前10位用户:\n"
     )
     
