@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Telegram 机器人管理脚本 
+# Telegram 机器人转发消息脚本 
 CONFIG_FILE="/root/telegram-bot/bot_config.py"
 INSTALL_DIR="/root/telegram-bot"
 SERVICE_FILE="/etc/systemd/system/telegram-bot.service"
