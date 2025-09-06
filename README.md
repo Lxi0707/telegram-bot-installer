@@ -28,6 +28,8 @@ chmod +x bot_manager.sh
 
 
 ⬇️⬇️⬇️
+
+
 **支持所有媒体类型**
 
 
