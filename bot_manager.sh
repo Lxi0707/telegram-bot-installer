@@ -236,7 +236,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• 语音消息\n"
         "• 贴纸\n\n"
         "所有内容都会转发到指定群组。"
-        "此脚本由 @Lxi0707 脚本搭建"
+        "此服务由 @Lxi0707 脚本搭建"
     )
 
 async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
