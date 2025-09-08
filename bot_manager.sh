@@ -6,13 +6,13 @@ INSTALL_DIR="/root/telegram-bot"
 SERVICE_FILE="/etc/systemd/system/telegram-bot.service"
 SCRIPT_FILE="/root/bot_manager.sh"
 
-# 自动设置执行权限
+
 if [ ! -x "$SCRIPT_FILE" ]; then
     chmod +x "$SCRIPT_FILE"
     echo "已自动设置执行权限"
 fi
 
-# 颜色设置
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -20,7 +20,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# 显示菜单
+
 show_menu() {
     clear
     echo "================================================"
@@ -42,7 +42,7 @@ show_menu() {
     read -p "请输入您的选择 [0-10]: " choice
 }
 
-# 读取配置
+
 read_config() {
     if [ -f "$CONFIG_FILE" ]; then
         BOT_TOKEN=$(grep "BOT_TOKEN" "$CONFIG_FILE" | cut -d'"' -f2)
@@ -55,7 +55,7 @@ read_config() {
     fi
 }
 
-# 配置参数
+
 configure_bot() {
     clear
     echo "=== 配置机器人参数 ==="
@@ -78,7 +78,7 @@ configure_bot() {
     mkdir -p "$INSTALL_DIR"
     
     cat > "$CONFIG_FILE" << EOL
-# 机器人配置
+
 BOT_TOKEN = "$new_token"
 ADMIN_USER_ID = $new_admin
 GROUP_CHAT_ID = $new_group
@@ -89,7 +89,7 @@ EOL
     sleep 2
 }
 
-# 查看配置
+
 view_config() {
     clear
     echo "=== 当前配置 ==="
@@ -115,7 +115,7 @@ view_config() {
     read -p "按回车键返回菜单..."
 }
 
-# 安装机器人
+
 install_bot() {
     clear
     echo "=== 安装 Telegram 机器人 ==="
@@ -247,17 +247,17 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
     user = update.effective_user
     message = update.message
     
-    # 记录用户使用情况
+    
     record_user_usage(user.id, user.username, user.first_name, user.last_name)
     
-    # 准备转发消息的文本
+    
     user_info = f"来自用户: {user.first_name}"
     if user.username:
         user_info += f" (@{user.username})"
     user_info += f"\n用户ID: {user.id}"
     
     try:
-        # 转发不同类型的消息
+    
         if message.text:
             # 文本消息
             forward_text = f"{user_info}\n\n消息内容:\n{message.text}"
@@ -268,12 +268,12 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             )
             
         elif message.photo:
-            # 图片消息
+    
             caption = f"{user_info}\n\n图片消息"
             if message.caption:
                 caption += f"\n描述: {message.caption}"
             
-            # 获取最高质量的图片
+    
             photo_file = await message.photo[-1].get_file()
             await context.bot.send_photo(
                 chat_id=GROUP_CHAT_ID,
@@ -282,12 +282,12 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             )
             
         elif message.video:
-            # 视频消息 - 修复转发问题
+        
             caption = f"{user_info}\n\n视频消息"
             if message.caption:
                 caption += f"\n描述: {message.caption}"
             
-            # 直接使用视频文件ID，避免下载和重新上传
+        
             await context.bot.send_video(
                 chat_id=GROUP_CHAT_ID,
                 video=message.video.file_id,
@@ -295,12 +295,12 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             )
             
         elif message.document:
-            # 文件/文档
+        
             caption = f"{user_info}\n\n文件: {message.document.file_name}"
             if message.caption:
                 caption += f"\n描述: {message.caption}"
             
-            # 直接使用文档文件ID
+        
             await context.bot.send_document(
                 chat_id=GROUP_CHAT_ID,
                 document=message.document.file_id,
@@ -308,9 +308,9 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             )
             
         elif message.voice:
-            # 语音消息
+        
             caption = f"{user_info}\n\n语音消息"
-            # 直接使用语音文件ID
+        
             await context.bot.send_voice(
                 chat_id=GROUP_CHAT_ID,
                 voice=message.voice.file_id,
@@ -318,33 +318,33 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             )
             
         elif message.sticker:
-            # 贴纸 - 修复转发问题
+        
             caption = f"{user_info}\n\n发送了贴纸"
-            # 直接使用贴纸文件ID
+        
             await context.bot.send_sticker(
                 chat_id=GROUP_CHAT_ID,
                 sticker=message.sticker.file_id
             )
-            # 贴纸不能有caption，所以单独发送说明文字
+        
             await context.bot.send_message(
                 chat_id=GROUP_CHAT_ID,
                 text=caption
             )
             
         elif message.audio:
-            # 音频文件
+        
             caption = f"{user_info}\n\n音频文件"
             if message.caption:
                 caption += f"\n描述: {message.caption}"
             
-            # 直接使用音频文件ID
+        
             await context.bot.send_audio(
                 chat_id=GROUP_CHAT_ID,
                 audio=message.audio.file_id,
                 caption=caption
             )
         
-        # 发送确认消息给用户
+    
         await message.reply_text("✅ 您的消息已成功转发到群组！")
         
     except Exception as e:
@@ -366,7 +366,7 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ 抱歉，您没有权限执行此命令。")
         return
     
-    # 获取统计信息
+
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
     
@@ -381,7 +381,7 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     conn.close()
     
-    # 构建统计消息
+
     stats_text = f"🤖 <b>机器人统计信息</b>\n\n"
     stats_text += f"👥 总用户数: <code>{total_users}</code>\n"
     stats_text += f"📨 总消息数: <code>{total_messages}</code>\n\n"
@@ -399,7 +399,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """错误处理"""
     logger.error(f"机器人错误: {context.error}")
     
-    # 向管理员发送错误报告
+
     try:
         error_message = f"⚠️ 机器人错误:\n{context.error}"
         await context.bot.send_message(chat_id=ADMIN_USER_ID, text=error_message)
@@ -407,17 +407,17 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"发送错误报告失败: {e}")
 
 def main():
-    # 初始化数据库
+
     init_database()
     
-    # 创建应用
+
     application = Application.builder().token(BOT_TOKEN).build()
-    
-    # 添加处理器 - 只处理私聊消息
+
+
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("stats", stats_command))
     
-    # 处理所有类型的私聊消息，忽略群组消息
+
     application.add_handler(MessageHandler(
         filters.ChatType.PRIVATE & (
             filters.TEXT | filters.PHOTO | filters.VIDEO | 
@@ -427,10 +427,10 @@ def main():
         handle_private_message
     ))
     
-    # 添加错误处理
+
     application.add_error_handler(error_handler)
+
     
-    # 启动机器人
     logger.info("🤖 机器人启动中...")
     print("🤖 机器人已启动！按 Ctrl+C 停止")
     application.run_polling()
@@ -477,7 +477,7 @@ EOL
     sleep 3
 }
 
-# 启动服务
+
 start_service() {
     clear
     echo "=== 启动机器人 ==="
@@ -501,7 +501,7 @@ start_service() {
     sleep 2
 }
 
-# 停止服务
+
 stop_service() {
     clear
     echo "=== 停止机器人 ==="
@@ -518,7 +518,7 @@ stop_service() {
     sleep 2
 }
 
-# 重启服务
+
 restart_service() {
     clear
     echo "=== 重启机器人 ==="
@@ -535,7 +535,7 @@ restart_service() {
     sleep 2
 }
 
-# 查看状态
+
 view_status() {
     clear
     echo "=== 机器人状态 ==="
@@ -546,7 +546,7 @@ view_status() {
     read -p "按回车键返回菜单..."
 }
 
-# 卸载机器人
+
 uninstall_bot() {
     clear
     echo "=== 卸载机器人 ==="
@@ -583,7 +583,7 @@ uninstall_bot() {
     sleep 2
 }
 
-# 生成安装脚本
+
 generate_script() {
     clear
     echo "=== 生成安装脚本 ==="
@@ -591,7 +591,7 @@ generate_script() {
     sleep 2
 }
 
-# 卸载管理脚本
+
 uninstall_manager() {
     clear
     echo "=== 卸载管理脚本 ==="
@@ -606,13 +606,13 @@ uninstall_manager() {
         return 1
     fi
     
-    # 删除alias
+    
     if [ -f ~/.bashrc ]; then
         sed -i '/alias botm=/d' ~/.bashrc
         echo "已删除alias配置"
     fi
     
-    # 删除脚本文件
+    
     if [ -f "$SCRIPT_FILE" ]; then
         rm -f "$SCRIPT_FILE"
         echo "已删除管理脚本: $SCRIPT_FILE"
@@ -623,11 +623,11 @@ uninstall_manager() {
     echo "注意：机器人服务仍然存在，如需卸载机器人请先使用选项8"
     sleep 3
     
-    # 退出脚本
+    
     exit 0
 }
 
-# 主循环
+
 main() {
     while true; do
         show_menu
@@ -655,11 +655,11 @@ main() {
     done
 }
 
-# 检查是否以root运行
+
 if [ "$EUID" -ne 0 ]; then 
     echo "请使用root权限运行此脚本"
     exit 1
 fi
 
-# 启动主程序
+
 main
