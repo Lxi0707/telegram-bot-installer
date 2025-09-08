@@ -1,7 +1,7 @@
 ***Tgbot消息转发🤖️***
 
 
-注意：前期准备 python3.7 以上，安装pip
+注意：支持Debian/Ubuntu系统
 
 **介绍**
 
