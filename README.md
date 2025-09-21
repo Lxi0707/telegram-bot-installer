@@ -3,6 +3,16 @@
 
 注意：支持Debian/Ubuntu系统
 
+
+# 预览：
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
+  <img alt="自定义图片" src="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
+</picture>
+
+
+
 **介绍**
 
 
