@@ -6,9 +6,9 @@
 
 # 预览：
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
-  <img alt="自定义图片" src="https://github.com/Lxi0707/Lxi0707/blob/main/index.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Lxi0707/telegram-bot-installer/refs/heads/main/IMG_2985.jpeg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Lxi0707/telegram-bot-installer/refs/heads/main/IMG_2985.jpeg">
+  <img alt="自定义图片" src="https://raw.githubusercontent.com/Lxi0707/telegram-bot-installer/refs/heads/main/IMG_2985.jpeg">
 </picture>
 
 
