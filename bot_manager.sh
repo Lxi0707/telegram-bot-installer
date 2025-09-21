@@ -1,6 +1,16 @@
 #!/bin/bash
 
+
 # Telegram 机器人转发消息脚本 
+# 用户使用bot，发送任意内容，bot识别后均可识别转发到指定的群组(可以添加绑定群组变量，添加后用户必须关注频道 ID/用户名 才可使用）
+# 参数介绍
+# BOT_TOKEN 从 @BotFather 获取 123456:ABC-DEF...
+# ADMIN_USER_ID 管理员用户ID 123456789
+# GROUP_CHAT_ID 接收消息的群组ID -1001234567890
+# REQUIRED_CHANNELS 用户必须加入的频道（可选） @channel1,-100123456789
+# 多个频道用英文逗号分隔，支持 @用户名 和 -100 开头的ID格式。
+
+
 
 CONFIG_FILE="/root/telegram-bot/bot_config.py"
 INSTALL_DIR="/root/telegram-bot"
