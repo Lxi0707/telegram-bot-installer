@@ -45,6 +45,7 @@ chmod +x bot_manager.sh
 | `BOT_TOKEN`             | 从 @BotFather 获取    | `123456:ABC-DEF1234ghIkl`    |
 | `ADMIN_USER_ID`               | 管理员用户ID   |  `123456789`     |
 | `GROUP_CHAT_ID`       | 接受消息群组ID   | `-100123456789`            |
+| `REQUIRED_CHANNELS`       | 用户必须加入的频道才可以使用bot（可选）功能：频道群组绑定，用户未关注无法使用   | `@channel1,-100123456789`            |
 
 
 
